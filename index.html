@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Predicción de Partida</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #f4f4f9;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    .container {
+      background-color: white;
+      padding: 30px 40px;
+      border-radius: 12px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+      width: 400px;
+    }
+
+    h1 {
+      text-align: center;
+      color: #333;
+      margin-bottom: 24px;
+    }
+
+    label {
+      display: block;
+      margin-top: 15px;
+      color: #555;
+      font-weight: 600;
+    }
+
+    input[type="number"] {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      margin-top: 5px;
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      margin-top: 25px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #45a049;
+    }
+
+    #resultado {
+      margin-top: 20px;
+      text-align: center;
+      font-weight: bold;
+      color: #444;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Formulario de Predicción</h1>
+    <form id="form">
+      <label for="f1">MatchKills:</label>
+      <input type="number" name="f1" required />
+
+      <label for="f2">MatchFlankKills:</label>
+      <input type="number" name="f2" required />
+
+      <label for="f3">MatchHeadshots:</label>
+      <input type="number" name="f3" required />
+
+      <button type="submit">Predecir</button>
+    </form>
+    <div id="resultado"></div>
+  </div>
+
+  <script>
+    const form = document.getElementById('form');
+    const resultado = document.getElementById('resultado');
+
+    form.addEventListener('submit', async function (e) {
+      e.preventDefault();
+
+      const f1 = parseFloat(form.f1.value);
+      const f2 = parseFloat(form.f2.value);
+      const f3 = parseFloat(form.f3.value);
+
+      const res = await fetch("http://127.0.0.1:5000/predict", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ features: [f1, f2, f3] })
+      });
+
+      const data = await res.json();
+
+      if (data.prediction !== undefined) {
+        resultado.textContent = `Predicción: ${data.prediction === 1 ? 'Ganó' : 'Perdió'}`;
+      } else {
+        resultado.textContent = "Error: " + (data.error || "Desconocido");
+      }
+    });
+  </script>
+</body>
+</html>
